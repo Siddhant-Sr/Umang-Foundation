@@ -1,9 +1,12 @@
 import React from 'react';
 import '../styles/Impact.css';
+import useIntersection from '../hooks/useIntersection';
 
 function Impact() {
+  const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+
   return (
-    <section className="impact" id="impact">
+    <section className={`impact ${isVisible ? 'animate' : ''}`} id="impact" ref={ref}>
       <div className="impact-container">
         <h2>Our Impact</h2>
         <p className="impact-intro">Real stories of change and transformation</p>

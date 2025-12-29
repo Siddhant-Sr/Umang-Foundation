@@ -9,12 +9,15 @@
   text-align: center;
 }
 
-.partners-grid {
+.partners-slider {
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.partners-track {
   display: flex;
   gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
+  animation: slideLeft 20s linear infinite;
 }
 
 .partner-card img {
@@ -25,4 +28,13 @@
   padding: 8px;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }

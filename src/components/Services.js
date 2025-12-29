@@ -1,7 +1,10 @@
 import React from 'react';
 import '../styles/Services.css';
+import useIntersection from '../hooks/useIntersection';
 
 function Services() {
+  const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+
   const services = [
     {
       id: 1,
@@ -30,7 +33,7 @@ function Services() {
   ];
 
   return (
-    <section className="services" id="services">
+    <section className={`services ${isVisible ? 'animate' : ''}`} id="services" ref={ref}>
       <div className="services-container">
         <h2>Our Services</h2>
         <p className="services-intro">Making a positive impact through our core programs</p>

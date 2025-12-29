@@ -8,6 +8,9 @@ const PARTNERS = [
   { name: 'Partner D', logo: 'https://via.placeholder.com/180x80?text=Partner+D' }
 ];
 
+// Duplicate for seamless loop
+const allPartners = [...PARTNERS, ...PARTNERS];
+
 function CorporatePartners() {
   return (
     <section className="partners" id="partners">
@@ -15,12 +18,14 @@ function CorporatePartners() {
         <h2>Corporate Partners</h2>
         <p className="partners-intro">We thank our corporate partners for their generous support.</p>
 
-        <div className="partners-grid">
-          {PARTNERS.map((p, i) => (
-            <div className="partner-card" key={i}>
-              <img src={p.logo} alt={p.name} />
-            </div>
-          ))}
+        <div className="partners-slider">
+          <div className="partners-track">
+            {allPartners.map((p, i) => (
+              <div className="partner-card" key={i}>
+                <img src={p.logo} alt={p.name} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

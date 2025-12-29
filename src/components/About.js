@@ -1,9 +1,12 @@
 import React from 'react';
 import '../styles/About.css';
+import useIntersection from '../hooks/useIntersection';
 
 function About() {
+  const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+
   return (
-    <section className="about" id="about">
+    <section className={`about ${isVisible ? 'animate' : ''}`} id="about" ref={ref}>
       <div className="about-container">
         <div className="about-content">
           <h2>About Umang Foundation</h2>
