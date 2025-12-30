@@ -163,23 +163,7 @@ function Header() {
                 </ul>
               )}
             </li>
-            <li 
-              className="dropdown"
-              onMouseEnter={() => handleMouseEnter('social-media')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <Link to="/social-media">
-                Social Media
-                <span className="dropdown-arrow">▼</span>
-              </Link>
-              {dropdownVisible === 'social-media' && (
-                <ul className="dropdown-menu">
-                  <li><Link to="/facebook">Facebook</Link></li>
-                  <li><Link to="/instagram">Instagram</Link></li>
-                  <li><Link to="/linkedin">LinkedIn</Link></li>
-                </ul>
-              )}
-            </li>
+            <li><Link to="/social-media">Social Media</Link></li>
             <li><Link to="/contact-us">Contact Us</Link></li>
           </ul>
         </nav>
