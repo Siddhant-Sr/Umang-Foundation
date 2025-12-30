@@ -18,12 +18,19 @@
 }
 
 .social-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 20px;
   background: var(--primary);
   color: white;
   border-radius: 6px;
   font-weight: 600;
+  text-decoration: none;
+}
+
+.social-icon {
+  font-size: 20px;
 }
 
 .social-link:hover {
