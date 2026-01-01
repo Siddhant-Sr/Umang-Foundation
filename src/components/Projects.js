@@ -1,9 +1,12 @@
 import React from 'react';
 import '../styles/Projects.css';
+import useIntersection from '../hooks/useIntersection';
 
 function Projects() {
+  const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+
   return (
-    <section className="projects" id="projects">
+    <section className={`projects ${isVisible ? 'animate' : ''}`} id="projects" ref={ref}>
       <div className="projects-container">
         <h2>Our Projects</h2>
         <p className="projects-intro">A selection of ongoing and completed projects that empower children and communities.</p>

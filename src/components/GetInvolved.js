@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import '../styles/GetInvolved.css';
+import useIntersection from '../hooks/useIntersection';
 
 function GetInvolved() {
+  const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,7 +27,7 @@ function GetInvolved() {
   };
 
   return (
-    <section className="get-involved" id="get-involved">
+    <section className={`get-involved ${isVisible ? 'animate' : ''}`} id="get-involved" ref={ref}>
       <div className="get-involved-container">
         <h2>Get Involved</h2>
         <p className="intro-text">Join us in making a difference</p>

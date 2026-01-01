@@ -7,17 +7,17 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
+  color: var(--muted);
 }
 
 :root {
-  --primary: #B7B1F2;
-  --primary-dark: #9D96D8;
-  --accent: #FDB7EA;
-  --accent-dark: #F499D0;
-  --accent-2: #FFDCCC;
-  --muted: #666666;
-  --bg: #FBF3B9;
+  --primary: #006cb5;
+  --primary-dark: #005691;
+  --accent: #78b833;
+  --accent-dark: #609329;
+  --accent-2: #e6f3ff;
+  --muted: #2b2a29;
+  --bg: #f8f9fa;
 }
 
 .App {
@@ -51,7 +51,7 @@ button {
 .btn-primary:hover {
   background-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(183, 177, 242, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 108, 181, 0.4);
 }
 
 .btn-secondary {

@@ -1,5 +1,5 @@
 .get-involved {
-  background-color: #f8f9fa;
+  background-color: var(--bg);
   padding: 80px 20px;
 }
 
@@ -16,7 +16,7 @@
 .intro-text {
   text-align: center;
   font-size: 1.2rem;
-  color: #666;
+  color: var(--muted);
   margin-bottom: 50px;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .option-card:hover {
-  box-shadow: 0 10px 30px rgba(33, 150, 243, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 108, 181, 0.15);
   transform: translateY(-5px);
 }
 
@@ -50,7 +50,7 @@
 
 .option-card p {
   font-size: 1rem;
-  color: #666;
+  color: var(--muted);
   margin-bottom: 25px;
   line-height: 1.6;
 }
@@ -118,5 +118,20 @@
 
   .contact-form-container {
     padding: 30px 20px;
+  }
+}
+
+.get-involved.animate {
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

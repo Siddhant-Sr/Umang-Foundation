@@ -1,0 +1,120 @@
+.page-container {
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 0;
+  background: linear-gradient(135deg, var(--accent-2) 0%, #f8f9fa 100%);
+  border-radius: 10px;
+  margin: 20px 0 40px 0;
+}
+
+.page-header h1 {
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.page-header p {
+  color: var(--text);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.trustees-section h2,
+.board-members-section h2 {
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.trustees-grid,
+.board-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.trustee-card,
+.board-member-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trustee-card:hover,
+.board-member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.trustee-image,
+.board-member-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.trustee-image img,
+.board-member-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.trustee-card:hover .trustee-image img,
+.board-member-card:hover .board-member-image img {
+  transform: scale(1.05);
+}
+
+.trustee-info,
+.board-member-info {
+  padding: 20px;
+}
+
+.trustee-info h3,
+.board-member-info h3 {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+}
+
+.trustee-position,
+.board-member-position {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.trustee-description,
+.board-member-description {
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .trustees-grid,
+  .board-members-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trustee-card,
+  .board-member-card {
+    margin: 0 10px;
+  }
+}
