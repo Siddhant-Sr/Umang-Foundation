@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Header.css';
-import logo from '../assets/images/Umang-Foundation-Logo.png';
+import { getLogo, getProjects } from '../utils/api';
 
 function Header() {
+  const [logo, setLogo] = useState('https://via.placeholder.com/150x50?text=Umang+Foundation+Logo');
+  const [loading, setLoading] = useState(true);
   const [dropdownVisible, setDropdownVisible] = useState(null);
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    const loadLogo = async () => {
+      const data = await getLogo();
+      if (data && data.data) {
+        const logoUrl = data.data.attributes.logo?.data?.attributes?.url
+          ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${data.data.attributes.logo.data.attributes.url}`
+          : 'https://via.placeholder.com/150x50?text=Umang+Foundation+Logo';
+        setLogo(logoUrl);
+      }
+    };
+    const loadProjects = async () => {
+      const data = await getProjects();
+      if (data && data.data) {
+        setProjects(data.data);
+      }
+    };
+    loadLogo();
+    loadProjects();
+    setLoading(false);
+  }, []);
 
   const handleMouseEnter = (menu) => {
     setDropdownVisible(menu);
@@ -14,11 +38,17 @@ function Header() {
     setDropdownVisible(null);
   };
 
+  if (loading) {
+    return <header className="header"><div>Loading header...</div></header>;
+  }
+
   return (
     <header className="header">
       <div className="header-container">
         <div className="logo">
-          <img src={logo} alt="Umang Foundation Logo" className="logo-image" />
+          <Link to="/">
+            <img src={logo} alt="Umang Foundation Logo" className="logo-image" />
+          </Link>
         </div>
         <nav className="navbar">
           <ul className="nav-links">
@@ -39,30 +69,15 @@ function Header() {
                 </ul>
               )}
             </li>
-            <li 
-              className="dropdown"
-              onMouseEnter={() => handleMouseEnter('projects')}
-              onMouseLeave={handleMouseLeave}
-            >
+            <li>
               <Link to="/projects">
                 Projects
-                <span className="dropdown-arrow">▼</span>
               </Link>
-              {dropdownVisible === 'projects' && (
-                <ul className="dropdown-menu">
-                  <li><Link to="/school-renovation">School Renovation</Link></li>
-                  <li><Link to="/blood-donation-camp">Blood Donation Camp</Link></li>
-                  <li><Link to="/village-activities">Village Activities</Link></li>
-                  <li><Link to="/inspire-a-kid-program">Inspire a Kid Program</Link></li>
-                  <li><Link to="/promote-education">Promote Education</Link></li>
-                  <li><Link to="/smart-classroom">Smart Classroom</Link></li>
-                  <li><Link to="/gurukul-program">Gurukul Program</Link></li>
-                  <li><Link to="/meri-umang">Meri Umang</Link></li>
-                  <li><Link to="/swatch-jal">Swatch Jal</Link></li>
-                  <li><Link to="/umang-care">Umang Care</Link></li>
-                  <li><Link to="/creative-hands">Creative Hands</Link></li>
-                </ul>
-              )}
+            </li>
+            <li>
+              <Link to="/resource-manager">
+                Resource Manager
+              </Link>
             </li>
             <li 
               className="dropdown"
@@ -146,22 +161,10 @@ function Header() {
                 </ul>
               )}
             </li>
-            <li 
-              className="dropdown"
-              onMouseEnter={() => handleMouseEnter('corporate-partners')}
-              onMouseLeave={handleMouseLeave}
-            >
+            <li>
               <Link to="/corporate-partners">
                 Corporate Partners
-                <span className="dropdown-arrow">▼</span>
               </Link>
-              {dropdownVisible === 'corporate-partners' && (
-                <ul className="dropdown-menu">
-                  <li><Link to="/corporate-logos">Logo of Corporate Partners</Link></li>
-                  <li><Link to="/corporate-names">Names of Corporate Partners</Link></li>
-                  <li><Link to="/schools-list">List of Schools</Link></li>
-                </ul>
-              )}
             </li>
             <li><Link to="/social-media">Social Media</Link></li>
             <li><Link to="/contact-us">Contact Us</Link></li>

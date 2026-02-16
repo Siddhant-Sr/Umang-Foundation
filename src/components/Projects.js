@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/Projects.css';
 import useIntersection from '../hooks/useIntersection';
+import { getProjects } from '../utils/api';
 
 function Projects() {
   const [ref, isVisible] = useIntersection({ threshold: 0.1 });
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      const data = await getProjects();
+      if (data && data.data) {
+        setProjects(data.data);
+      }
+      setLoading(false);
+    };
+    loadProjects();
+  }, []);
+
+  if (loading) {
+    return <section className="projects" id="projects"><div>Loading projects...</div></section>;
+  }
 
   return (
     <section className={`projects ${isVisible ? 'animate' : ''}`} id="projects" ref={ref}>
@@ -12,18 +31,14 @@ function Projects() {
         <p className="projects-intro">A selection of ongoing and completed projects that empower children and communities.</p>
 
         <div className="projects-grid">
-          <div className="project-card">
-            <h3>School Support Program</h3>
-            <p>Providing school supplies, uniforms and learning support to children in need.</p>
-          </div>
-          <div className="project-card">
-            <h3>Health Camps</h3>
-            <p>Regular medical camps and awareness drives in rural areas.</p>
-          </div>
-          <div className="project-card">
-            <h3>Skill Development</h3>
-            <p>Training youth in vocational skills for sustainable livelihoods.</p>
-          </div>
+          {projects.map(project => (
+            <div className="project-card" key={project.id}>
+              <Link to={`/projects/${project.attributes.slug}`}>
+                <h3>{project.attributes.title}</h3>
+                <p>{project.attributes.description}</p>
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </section>
