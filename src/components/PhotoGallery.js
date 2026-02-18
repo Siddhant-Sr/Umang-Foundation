@@ -1,83 +1,161 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/MediaGallery.css';
-
-// Sample photo data organized by categories - in real implementation, this would come from an API or database
-const PHOTO_CATEGORIES = {
-  'projects': {
-    title: 'Projects',
-    description: 'Photos from our various educational and community development projects',
-    subcategories: {
-      'education': {
-        title: 'Education Programs',
-        items: [
-          { id: 1, src: '../assets/images/school-children-classroom.jpg', alt: 'Children in classroom learning', location: 'Mumbai School', date: '2024-01-15' },
-          { id: 2, src: '../assets/images/school-children-group.jpg', alt: 'Group study session', location: 'Delhi Center', date: '2024-01-10' },
-          { id: 3, src: '../assets/images/download.webp', alt: 'Digital learning program', location: 'Pune Academy', date: '2024-01-05' },
-        ]
-      },
-      'health': {
-        title: 'Health & Nutrition',
-        items: [
-          { id: 4, src: '../assets/images/download-1.webp', alt: 'Health checkup camp', location: 'Rural Health Center', date: '2023-12-20' },
-          { id: 5, src: '../assets/images/OIP-2.webp', alt: 'Nutrition program distribution', location: 'Community Hall', date: '2023-12-15' },
-        ]
-      }
-    }
-  },
-  'schools': {
-    title: 'Associated Schools',
-    description: 'Partner schools and educational institutions we work with',
-    subcategories: {
-      'primary': {
-        title: 'Primary Schools',
-        items: [
-          { id: 6, src: '../assets/images/img-1.webp', alt: 'Primary school classroom', location: 'St. Mary\'s Primary School', date: '2024-01-12' },
-          { id: 7, src: '../assets/images/school-children-classroom.jpg', alt: 'Children at primary school', location: 'Government Primary School', date: '2024-01-08' },
-        ]
-      },
-      'secondary': {
-        title: 'Secondary Schools',
-        items: [
-          { id: 8, src: '../assets/images/school-children-group.jpg', alt: 'Secondary school students', location: 'City Secondary School', date: '2024-01-06' },
-        ]
-      }
-    }
-  },
-  'events': {
-    title: 'Events & Celebrations',
-    description: 'Special events, celebrations, and community gatherings',
-    subcategories: {
-      'celebrations': {
-        title: 'Festivals & Celebrations',
-        items: [
-          { id: 9, src: '../assets/images/download.webp', alt: 'Independence Day celebration', location: 'Community Ground', date: '2024-01-14' },
-          { id: 10, src: '../assets/images/download-1.webp', alt: 'Children\'s Day event', location: 'School Auditorium', date: '2023-11-14' },
-        ]
-      },
-      'workshops': {
-        title: 'Workshops & Training',
-        items: [
-          { id: 11, src: '../assets/images/OIP-2.webp', alt: 'Teacher training workshop', location: 'Training Center', date: '2024-01-20' },
-        ]
-      }
-    }
-  }
-};
+import '../styles/SkeletonGallery.css';
+import { fetchData } from '../utils/api';
 
 function PhotoGallery() {
-  const [activeCategory, setActiveCategory] = useState('projects');
-  const [activeSubcategory, setActiveSubcategory] = useState('education');
+  const [photoCategories, setPhotoCategories] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('');
+  const [activeSubcategory, setActiveSubcategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  const currentCategoryData = PHOTO_CATEGORIES[activeCategory];
-  const currentSubcategoryData = currentCategoryData.subcategories[activeSubcategory];
-  const totalItems = currentSubcategoryData.items.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  useEffect(() => {
+    const loadPhotos = async () => {
+      const data = await fetchData('/photos?populate=*');
+      // let grouped = {};
+      if (data && data.data && data.data.length > 0) {
+        // Group by year
+        const yearwise = {};
+        // Group by activity/category
+        const activitywise = {};
+        data.data.forEach(photo => {
+          // Yearwise
+          const year = photo.date ? String(new Date(photo.date).getFullYear()) : 'Unknown';
+          let imgUrl = '';
+          if (photo.image && photo.image.formats) {
+            if (photo.image.formats.thumbnail) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.thumbnail.url}`;
+            } else if (photo.image.formats.small) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.small.url}`;
+            } else if (photo.image.url) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+            }
+          } else if (photo.image && photo.image.url) {
+            imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+          } else {
+            imgUrl = 'https://via.placeholder.com/400x300?text=No+Image';
+          }
+          if (!yearwise[year]) {
+            yearwise[year] = {
+              title: year,
+              items: []
+            };
+          }
+          yearwise[year].items.push({
+            id: photo.id,
+            src: imgUrl,
+            alt: photo.alt || photo.title || 'Photo',
+            location: photo.location || 'Unknown',
+            date: photo.date || '',
+            title: photo.title || '',
+          });
 
+          // Activitywise
+          const cat = photo.category;
+          const subcat = photo.subcategory;
+          if (!activitywise[cat]) {
+            activitywise[cat] = {
+              title: cat,
+              subcategories: {}
+            };
+          }
+          if (!activitywise[cat].subcategories[subcat]) {
+            activitywise[cat].subcategories[subcat] = {
+              title: subcat,
+              items: []
+            };
+          }
+          activitywise[cat].subcategories[subcat].items.push({
+            id: photo.id,
+            src: imgUrl,
+            alt: photo.alt || photo.title || 'Photo',
+            location: photo.location || 'Unknown',
+            date: photo.date || '',
+            title: photo.title || '',
+          });
+        });
+        // Compose the two main tabs
+        const grouped = {
+          Yearwise: {
+            title: 'Yearwise',
+            description: 'Photos grouped by year',
+            subcategories: yearwise
+          },
+          Activitywise: {
+            title: 'Activitywise',
+            description: 'Photos grouped by activity',
+            subcategories: activitywise
+          }
+        };
+        setPhotoCategories(grouped);
+        setActiveCategory('Yearwise');
+        const yearKeys = Object.keys(yearwise);
+        setActiveSubcategory(yearKeys.length > 0 ? yearKeys[0] : '');
+      }
+      setLoading(false);
+    };
+    loadPhotos();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="gallery-container">
+        <div className="skeleton-gallery-grid">
+          {[...Array(6)].map((_, i) => (
+            <div className="skeleton-gallery-card" key={i}>
+              <div className="skeleton-img"></div>
+              <div className="skeleton-title"></div>
+              <div className="skeleton-desc"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeCategory || !photoCategories[activeCategory]) {
+    return <div className="gallery-container"><p>No photos available.</p></div>;
+  }
+
+  // For Yearwise, subcategories are years; for Activitywise, subcategories are activities, then subcategories
+  const currentCategoryData = photoCategories[activeCategory];
+  let subcategoryKeys = [];
+  let subcategoryMap = {};
+  if (activeCategory === 'Yearwise') {
+    subcategoryKeys = Object.keys(currentCategoryData.subcategories).sort((a, b) => b.localeCompare(a)); // Descending year
+    subcategoryMap = currentCategoryData.subcategories;
+  } else if (activeCategory === 'Activitywise') {
+    // Flatten activitywise: show all activities as subcategories, then when one is selected, show its sub-subcategories
+    subcategoryKeys = Object.keys(currentCategoryData.subcategories);
+    subcategoryMap = currentCategoryData.subcategories;
+  }
+
+  // For Activitywise, if a subcategory is selected, show its subcategories as tabs
+  let currentSubcategoryData = null;
+  let subSubcategoryKeys = [];
+  let subSubcategoryMap = {};
+  if (activeCategory === 'Activitywise' && activeSubcategory && subcategoryMap[activeSubcategory]) {
+    subSubcategoryMap = subcategoryMap[activeSubcategory].subcategories;
+    subSubcategoryKeys = subSubcategoryMap ? Object.keys(subSubcategoryMap) : [];
+    // If a sub-subcategory is selected, show its items
+    if (subSubcategoryKeys.length > 0) {
+      // If activeSubSubcategory is not set, default to first
+      if (!window._activeSubSubcategory || !subSubcategoryMap[window._activeSubSubcategory]) {
+        window._activeSubSubcategory = subSubcategoryKeys[0];
+      }
+      currentSubcategoryData = subSubcategoryMap[window._activeSubSubcategory];
+    }
+  } else {
+    currentSubcategoryData = subcategoryMap[activeSubcategory];
+  }
+
+  const totalItems = currentSubcategoryData ? currentSubcategoryData.items.length : 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = currentSubcategoryData.items.slice(startIndex, endIndex);
+  const currentItems = currentSubcategoryData ? currentSubcategoryData.items.slice(startIndex, endIndex) : [];
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -85,12 +163,28 @@ function PhotoGallery() {
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
-    setActiveSubcategory(Object.keys(PHOTO_CATEGORIES[category].subcategories)[0]);
     setCurrentPage(1);
+    // Set default subcategory
+    const keys = Object.keys(photoCategories[category].subcategories);
+    setActiveSubcategory(keys.length > 0 ? keys[0] : '');
+    // For Activitywise, reset sub-subcategory
+    if (category === 'Activitywise') {
+      window._activeSubSubcategory = null;
+    }
   };
 
   const handleSubcategoryChange = (subcategory) => {
     setActiveSubcategory(subcategory);
+    setCurrentPage(1);
+    // For Activitywise, reset sub-subcategory
+    if (activeCategory === 'Activitywise') {
+      window._activeSubSubcategory = null;
+    }
+  };
+
+  // For Activitywise, handle sub-subcategory
+  const handleSubSubcategoryChange = (subsubcategory) => {
+    window._activeSubSubcategory = subsubcategory;
     setCurrentPage(1);
   };
 
@@ -100,9 +194,9 @@ function PhotoGallery() {
         <h2>Photo Gallery</h2>
         <p className="gallery-intro">Comprehensive collection of photos from our projects, schools, events, and community activities.</p>
 
-        {/* Main Category Tabs */}
+        {/* Main Tabs: Yearwise / Activitywise */}
         <div className="category-tabs">
-          {Object.entries(PHOTO_CATEGORIES).map(([key, category]) => (
+          {Object.entries(photoCategories).map(([key, category]) => (
             <button
               key={key}
               className={`category-tab ${activeCategory === key ? 'active' : ''}`}
@@ -118,16 +212,31 @@ function PhotoGallery() {
 
         {/* Subcategory Tabs */}
         <div className="subcategory-tabs">
-          {Object.entries(currentCategoryData.subcategories).map(([key, subcategory]) => (
+          {subcategoryKeys.map((key) => (
             <button
               key={key}
               className={`subcategory-tab ${activeSubcategory === key ? 'active' : ''}`}
               onClick={() => handleSubcategoryChange(key)}
             >
-              {subcategory.title} ({subcategory.items.length})
+              {subcategoryMap[key].title} {subcategoryMap[key].items ? `(${subcategoryMap[key].items.length})` : ''}
             </button>
           ))}
         </div>
+
+        {/* For Activitywise, show sub-subcategory tabs if present */}
+        {activeCategory === 'Activitywise' && subSubcategoryKeys.length > 0 && (
+          <div className="subcategory-tabs">
+            {subSubcategoryKeys.map((key) => (
+              <button
+                key={key}
+                className={`subcategory-tab ${window._activeSubSubcategory === key ? 'active' : ''}`}
+                onClick={() => handleSubSubcategoryChange(key)}
+              >
+                {subSubcategoryMap[key].title} ({subSubcategoryMap[key].items.length})
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Photo Grid */}
         <div className="gallery-grid">
@@ -176,7 +285,7 @@ function PhotoGallery() {
 
         {/* Stats */}
         <div className="gallery-stats">
-          <p>Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} photos in {currentSubcategoryData.title}</p>
+          <p>Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} photos in {currentSubcategoryData ? currentSubcategoryData.title : ''}</p>
         </div>
       </div>
     </section>

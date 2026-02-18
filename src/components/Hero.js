@@ -1,14 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Hero.css';
-import img1 from '../assets/images/school-children-classroom.jpg';
-import img2 from '../assets/images/school-children-group.jpg';
-import img3 from '../assets/images/download.webp';
-import img4 from '../assets/images/download-1.webp';
+import '../styles/SkeletonGallery.css';
+import { getHeroImages } from '../utils/api';
 
 function Hero() {
-  const images = [img1, img2, img3, img4];
+  const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHeroImages = async () => {
+      const data = await getHeroImages();
+      if (data && data.data) {
+        const imgUrls = data.data.map(img => 
+          img.attributes.image?.data?.attributes?.url
+            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${img.attributes.image.data.attributes.url}`
+            : 'https://via.placeholder.com/800x400?text=Hero+Image'
+        );
+        setImages(imgUrls);
+      } else {
+        // Fallback to placeholders
+        setImages([
+          'https://via.placeholder.com/800x400?text=Hero+Image+1',
+          'https://via.placeholder.com/800x400?text=Hero+Image+2',
+          'https://via.placeholder.com/800x400?text=Hero+Image+3',
+          'https://via.placeholder.com/800x400?text=Hero+Image+4'
+        ]);
+      }
+      setLoading(false);
+    };
+    loadHeroImages();
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -23,13 +46,21 @@ function Hero() {
   };
 
   useEffect(() => {
-    if (!isPaused) {
+    if (!isPaused && images.length > 0) {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
       }, 3000); // Change image every 3 seconds
       return () => clearInterval(interval);
     }
   }, [images.length, isPaused]);
+
+  if (loading) {
+    return (
+      <section className="hero">
+        <div className="skeleton-hero"></div>
+      </section>
+    );
+  }
 
   return (
     <section className="hero" id="home">

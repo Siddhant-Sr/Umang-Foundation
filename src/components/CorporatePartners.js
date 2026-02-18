@@ -1,17 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Partners.css';
-
-const PARTNERS = [
-  { name: 'Partner A', logo: 'https://via.placeholder.com/180x80?text=Partner+A' },
-  { name: 'Partner B', logo: 'https://via.placeholder.com/180x80?text=Partner+B' },
-  { name: 'Partner C', logo: 'https://via.placeholder.com/180x80?text=Partner+C' },
-  { name: 'Partner D', logo: 'https://via.placeholder.com/180x80?text=Partner+D' }
-];
-
-// Duplicate for seamless loop
-const allPartners = [...PARTNERS, ...PARTNERS];
+import { getPartners } from '../utils/api';
 
 function CorporatePartners() {
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPartners = async () => {
+      const data = await getPartners();
+      if (data && data.data) {
+        const partnerList = data.data.map(partner => {
+          const name = partner?.attributes?.name || 'Unknown Partner';
+          const logo = partner?.attributes?.logo?.data?.attributes?.url
+            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${partner.attributes.logo.data.attributes.url}`
+            : 'https://via.placeholder.com/180x80?text=Partner';
+          return { name, logo };
+        });
+        // Duplicate for seamless loop
+        setPartners([...partnerList, ...partnerList]);
+      } else {
+        setPartners([]);
+      }
+      setLoading(false);
+    };
+    loadPartners();
+  }, []);
+
+  if (loading) {
+    return <div>Loading partners...</div>;
+  }
+
   return (
     <section className="partners" id="partners">
       <div className="partners-container">
@@ -20,7 +39,7 @@ function CorporatePartners() {
 
         <div className="partners-slider">
           <div className="partners-track">
-            {allPartners.map((p, i) => (
+            {partners.map((p, i) => (
               <div className="partner-card" key={i}>
                 <img src={p.logo} alt={p.name} />
               </div>

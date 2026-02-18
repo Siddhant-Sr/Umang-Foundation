@@ -1,44 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/MediaGallery.css';
-
-// Sample media data - in real implementation, this would come from an API or database
-const MEDIA_CATEGORIES = {
-  'newspaper-clippings': {
-    title: 'Newspaper Clippings',
-    items: [
-      { id: 1, src: '../assets/images/school-children-classroom.jpg', alt: 'School children in classroom', date: '2024-01-15' },
-      { id: 2, src: '../assets/images/school-children-group.jpg', alt: 'Group of school children', date: '2024-01-10' },
-      { id: 3, src: '../assets/images/download.webp', alt: 'Educational program coverage', date: '2024-01-05' },
-      { id: 4, src: '../assets/images/download-1.webp', alt: 'Community outreach event', date: '2023-12-20' },
-      { id: 5, src: '../assets/images/OIP-2.webp', alt: 'School inauguration ceremony', date: '2023-12-15' },
-      { id: 6, src: '../assets/images/img-1.webp', alt: 'Children receiving educational materials', date: '2023-12-10' },
-      // Add more items as needed
-    ]
-  },
-  'online-links': {
-    title: 'Online Media Coverage',
-    items: [
-      { id: 7, src: '../assets/images/school-children-classroom.jpg', alt: 'Digital media coverage', date: '2024-01-12' },
-      { id: 8, src: '../assets/images/school-children-group.jpg', alt: 'Online article feature', date: '2024-01-08' },
-      // Add more items as needed
-    ]
-  },
-  'youtube-links': {
-    title: 'YouTube Videos',
-    items: [
-      { id: 9, src: '../assets/images/download.webp', alt: 'Educational program video', date: '2024-01-14' },
-      { id: 10, src: '../assets/images/download-1.webp', alt: 'Community impact story', date: '2024-01-06' },
-      // Add more items as needed
-    ]
-  }
-};
+import '../styles/SkeletonGallery.css';
+import { fetchData } from '../utils/api';
 
 function MediaGallery() {
-  const [activeCategory, setActiveCategory] = useState('newspaper-clippings');
+  const [mediaCategories, setMediaCategories] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  const currentCategoryData = MEDIA_CATEGORIES[activeCategory];
+  useEffect(() => {
+    const loadMedia = async () => {
+      const data = await fetchData('/media?populate=*');
+      let grouped = {};
+      if (data && data.data && data.data.length > 0) {
+        // Group media by category
+        data.data.forEach(media => {
+          const cat = media.attributes.category;
+          const imgUrl = media.attributes.image?.data?.attributes?.url
+            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${media.attributes.image.data.attributes.url}`
+            : 'https://via.placeholder.com/400x300?text=No+Image';
+
+          if (!grouped[cat]) {
+            grouped[cat] = {
+              title: cat.charAt(0).toUpperCase() + cat.slice(1),
+              items: []
+            };
+          }
+          grouped[cat].items.push({
+            id: media.id,
+            src: imgUrl,
+            alt: media.attributes.alt || 'Media',
+            date: media.attributes.date || '2024-01-01'
+          });
+        });
+      } else {
+        // Fallback dummy data
+        grouped = {
+          "newspapers": {
+            title: "Newspapers",
+            items: [
+              { id: 1, src: "https://via.placeholder.com/400x300?text=Newspaper+1", alt: "Newspaper Clipping 1", date: "2025-01-10" },
+              { id: 2, src: "https://via.placeholder.com/400x300?text=Newspaper+2", alt: "Newspaper Clipping 2", date: "2025-02-15" }
+            ]
+          },
+          "online": {
+            title: "Online",
+            items: [
+              { id: 3, src: "https://via.placeholder.com/400x300?text=Online+Media+1", alt: "Online Media 1", date: "2025-03-20" }
+            ]
+          },
+          "youtube": {
+            title: "YouTube",
+            items: [
+              { id: 4, src: "https://via.placeholder.com/400x300?text=YouTube+Video", alt: "YouTube Video", date: "2025-04-05" }
+            ]
+          }
+        };
+      }
+      setMediaCategories(grouped);
+      if (Object.keys(grouped).length > 0) {
+        setActiveCategory(Object.keys(grouped)[0]);
+      }
+      setLoading(false);
+    };
+    loadMedia();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="gallery-container">
+        <div className="skeleton-gallery-grid">
+          {[...Array(6)].map((_, i) => (
+            <div className="skeleton-gallery-card" key={i}>
+              <div className="skeleton-img"></div>
+              <div className="skeleton-title"></div>
+              <div className="skeleton-desc"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeCategory || !mediaCategories[activeCategory]) {
+    return <div className="gallery-container"><p>No media available.</p></div>;
+  }
+
+  const currentCategoryData = mediaCategories[activeCategory];
   const totalItems = currentCategoryData.items.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -63,7 +113,7 @@ function MediaGallery() {
 
         {/* Category Tabs */}
         <div className="category-tabs">
-          {Object.entries(MEDIA_CATEGORIES).map(([key, category]) => (
+          {Object.entries(mediaCategories).map(([key, category]) => (
             <button
               key={key}
               className={`category-tab ${activeCategory === key ? 'active' : ''}`}

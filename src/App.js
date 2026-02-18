@@ -8,8 +8,7 @@ import AboutPage from './pages/AboutPage';
 import TrusteesProfilePage from './pages/TrusteesProfilePage';
 import GoverningBoardMemberPage from './pages/GoverningBoardMemberPage';
 import ProjectsPage from './pages/ProjectsPage';
-import SchoolRenovationPage from './pages/SchoolRenovationPage';
-import BloodDonationCampPage from './pages/BloodDonationCampPage';
+import ProjectPage from './pages/ProjectPage';
 import InternshipPage from './pages/InternshipPage';
 import AssociatedSchoolsPage from './pages/AssociatedSchoolsPage';
 import StoryOfChangePage from './pages/StoryOfChangePage';
@@ -23,6 +22,7 @@ import CorporatePartnersPage from './pages/CorporatePartnersPage';
 import CorporateLogosPage from './pages/CorporateLogosPage';
 import GetInvolvedPage from './pages/GetInvolvedPage';
 import SocialMediaPage from './pages/SocialMediaPage';
+import ResourceManagerPage from './pages/ResourceManagerPage';
 
 function App() {
   return (
@@ -35,19 +35,10 @@ function App() {
           <Route path="/trustees-profile" element={<TrusteesProfilePage />} />
           <Route path="/governing-board-member" element={<GoverningBoardMemberPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/school-renovation" element={<SchoolRenovationPage />} />
-          <Route path="/blood-donation-camp" element={<BloodDonationCampPage />} />
-          <Route path="/village-activities" element={<ProjectsPage />} />
-          <Route path="/inspire-a-kid-program" element={<ProjectsPage />} />
-          <Route path="/promote-education" element={<ProjectsPage />} />
-          <Route path="/smart-classroom" element={<ProjectsPage />} />
-          <Route path="/gurukul-program" element={<ProjectsPage />} />
-          <Route path="/meri-umang" element={<ProjectsPage />} />
-          <Route path="/swatch-jal" element={<ProjectsPage />} />
-          <Route path="/umang-care" element={<ProjectsPage />} />
-          <Route path="/creative-hands" element={<ProjectsPage />} />
+          <Route path="/projects/:slug" element={<ProjectPage />} />
           <Route path="/internship" element={<InternshipPage />} />
           <Route path="/associated-schools" element={<AssociatedSchoolsPage />} />
+          <Route path="/resource-manager" element={<ResourceManagerPage />} />
           <Route path="/associated-colleges" element={<InternshipPage />} />
           <Route path="/story-of-change" element={<StoryOfChangePage />} />
           <Route path="/impact-of-social-initiatives" element={<StoryOfChangePage />} />

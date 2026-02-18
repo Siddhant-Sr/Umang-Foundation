@@ -277,6 +277,10 @@
   margin: 0 auto;
 }
 
+.justified-text {
+  text-align: justify;
+}
+
 @media (max-width: 768px) {
   .page-header h1 {
     font-size: 2rem;
