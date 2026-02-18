@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Hero.css';
+import '../styles/SkeletonGallery.css';
 import { getHeroImages } from '../utils/api';
 
 function Hero() {
@@ -54,7 +55,11 @@ function Hero() {
   }, [images.length, isPaused]);
 
   if (loading) {
-    return <section className="hero"><div>Loading hero...</div></section>;
+    return (
+      <section className="hero">
+        <div className="skeleton-hero"></div>
+      </section>
+    );
   }
 
   return (

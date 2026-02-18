@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/MediaGallery.css';
+import '../styles/SkeletonGallery.css';
 import { fetchData } from '../utils/api';
 
 function MediaGallery() {
@@ -68,7 +69,19 @@ function MediaGallery() {
   }, []);
 
   if (loading) {
-    return <div className="gallery-container"><p>Loading media...</p></div>;
+    return (
+      <div className="gallery-container">
+        <div className="skeleton-gallery-grid">
+          {[...Array(6)].map((_, i) => (
+            <div className="skeleton-gallery-card" key={i}>
+              <div className="skeleton-img"></div>
+              <div className="skeleton-title"></div>
+              <div className="skeleton-desc"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (!activeCategory || !mediaCategories[activeCategory]) {

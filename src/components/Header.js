@@ -224,6 +224,8 @@ function Header() {
   // Menu configuration array
   const menuItems = [
     { name: "Home", path: "/" },
+    { name: "Projects", path: "/projects" },
+    { name: "Resource Manager", path: "/resource-manager" },
     {
       name: "About Us",
       path: "/about",
@@ -232,8 +234,6 @@ function Header() {
         { name: "Governing Board Member", path: "/governing-board-member" },
       ],
     },
-    { name: "Projects", path: "/projects" },
-    { name: "Resource Manager", path: "/resource-manager" },
     {
       name: "Internship",
       path: "/internship",

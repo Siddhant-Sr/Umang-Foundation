@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Projects.css';
+import '../styles/Skeleton.css';
 import useIntersection from '../hooks/useIntersection';
 import { getProjects } from '../utils/api';
 
@@ -39,7 +40,19 @@ function Projects() {
   if (loading) {
     return (
       <section className="projects" id="projects">
-        <div>Loading projects...</div>
+        <div className="projects-container">
+          <h2>Our Projects</h2>
+          <p className="projects-intro">A selection of ongoing and completed projects that empower children and communities.</p>
+          <div className="skeleton-grid">
+            {[...Array(6)].map((_, i) => (
+              <div className="skeleton-card" key={i}>
+                <div className="skeleton-title"></div>
+                <div className="skeleton-desc"></div>
+                <div className="skeleton-desc" style={{ width: '70%' }}></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     );
   }

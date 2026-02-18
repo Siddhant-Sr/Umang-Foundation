@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
+import '../styles/Skeleton.css';
 
 import { useParams } from 'react-router-dom';
 import '../styles/ProjectPages.css';
@@ -61,7 +63,19 @@ function ProjectPage() {
   }, [slug]);
 
   if (loading) {
-    return <div className="page-container"><p>Loading project...</p></div>;
+    return (
+      <div className="page-container">
+        <div className="skeleton-grid">
+          {[...Array(1)].map((_, i) => (
+            <div className="skeleton-card" key={i}>
+              <div className="skeleton-title" style={{ width: '60%', height: 28 }}></div>
+              <div className="skeleton-desc" style={{ width: '90%', height: 16 }}></div>
+              <div className="skeleton-desc" style={{ width: '70%', height: 16 }}></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (!project) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/MediaGallery.css';
+import '../styles/SkeletonGallery.css';
 import { fetchData } from '../utils/api';
 
 function PhotoGallery() {
@@ -15,78 +16,83 @@ function PhotoGallery() {
       const data = await fetchData('/photos?populate=*');
       let grouped = {};
       if (data && data.data && data.data.length > 0) {
-        // Group photos by category and subcategory
+        // Group by year
+        const yearwise = {};
+        // Group by activity/category
+        const activitywise = {};
         data.data.forEach(photo => {
-          const cat = photo.attributes.category;
-          const subcat = photo.attributes.subcategory;
-          const imgUrl = photo.attributes.image?.data?.attributes?.url
-            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.attributes.image.data.attributes.url}`
-            : 'https://via.placeholder.com/400x300?text=No+Image';
-
-          if (!grouped[cat]) {
-            grouped[cat] = {
-              title: cat.charAt(0).toUpperCase() + cat.slice(1),
-              description: `Photos from ${cat}`,
-              subcategories: {}
-            };
+          // Yearwise
+          const year = photo.date ? String(new Date(photo.date).getFullYear()) : 'Unknown';
+          let imgUrl = '';
+          if (photo.image && photo.image.formats) {
+            if (photo.image.formats.thumbnail) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.thumbnail.url}`;
+            } else if (photo.image.formats.small) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.small.url}`;
+            } else if (photo.image.url) {
+              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+            }
+          } else if (photo.image && photo.image.url) {
+            imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+          } else {
+            imgUrl = 'https://via.placeholder.com/400x300?text=No+Image';
           }
-          if (!grouped[cat].subcategories[subcat]) {
-            grouped[cat].subcategories[subcat] = {
-              title: subcat.charAt(0).toUpperCase() + subcat.slice(1),
+          if (!yearwise[year]) {
+            yearwise[year] = {
+              title: year,
               items: []
             };
           }
-          grouped[cat].subcategories[subcat].items.push({
+          yearwise[year].items.push({
             id: photo.id,
             src: imgUrl,
-            alt: photo.attributes.alt || 'Photo',
-            location: photo.attributes.location || 'Unknown',
-            date: photo.attributes.date || '2024-01-01'
+            alt: photo.alt || photo.title || 'Photo',
+            location: photo.location || 'Unknown',
+            date: photo.date || '',
+            title: photo.title || '',
+          });
+
+          // Activitywise
+          const cat = photo.category;
+          const subcat = photo.subcategory;
+          if (!activitywise[cat]) {
+            activitywise[cat] = {
+              title: cat,
+              subcategories: {}
+            };
+          }
+          if (!activitywise[cat].subcategories[subcat]) {
+            activitywise[cat].subcategories[subcat] = {
+              title: subcat,
+              items: []
+            };
+          }
+          activitywise[cat].subcategories[subcat].items.push({
+            id: photo.id,
+            src: imgUrl,
+            alt: photo.alt || photo.title || 'Photo',
+            location: photo.location || 'Unknown',
+            date: photo.date || '',
+            title: photo.title || '',
           });
         });
-      } else {
-        // Fallback dummy data
-        grouped = {
-          "yearwise": {
-            title: "Yearwise",
-            description: "Photos from Yearwise Activities",
-            subcategories: {
-              "2025": {
-                title: "2025",
-                items: [
-                  { id: 1, src: "https://via.placeholder.com/400x300?text=2025+Event+1", alt: "2025 Event 1", location: "Delhi", date: "2025-01-10" },
-                  { id: 2, src: "https://via.placeholder.com/400x300?text=2025+Event+2", alt: "2025 Event 2", location: "Mumbai", date: "2025-02-15" }
-                ]
-              },
-              "2024": {
-                title: "2024",
-                items: [
-                  { id: 3, src: "https://via.placeholder.com/400x300?text=2024+Event+1", alt: "2024 Event 1", location: "Kolkata", date: "2024-03-20" }
-                ]
-              }
-            }
+        // Compose the two main tabs
+        const grouped = {
+          Yearwise: {
+            title: 'Yearwise',
+            description: 'Photos grouped by year',
+            subcategories: yearwise
           },
-          "activitywise": {
-            title: "Activitywise",
-            description: "Photos from Activitywise Events",
-            subcategories: {
-              "Blood Donation": {
-                title: "Blood Donation",
-                items: [
-                  { id: 4, src: "https://via.placeholder.com/400x300?text=Blood+Donation", alt: "Blood Donation Camp", location: "Chennai", date: "2025-04-05" }
-                ]
-              }
-            }
+          Activitywise: {
+            title: 'Activitywise',
+            description: 'Photos grouped by activity',
+            subcategories: activitywise
           }
         };
-      }
-      setPhotoCategories(grouped);
-      if (Object.keys(grouped).length > 0) {
-        const firstCat = Object.keys(grouped)[0];
-        setActiveCategory(firstCat);
-        if (grouped[firstCat].subcategories && Object.keys(grouped[firstCat].subcategories).length > 0) {
-          setActiveSubcategory(Object.keys(grouped[firstCat].subcategories)[0]);
-        }
+        setPhotoCategories(grouped);
+        setActiveCategory('Yearwise');
+        const yearKeys = Object.keys(yearwise);
+        setActiveSubcategory(yearKeys.length > 0 ? yearKeys[0] : '');
       }
       setLoading(false);
     };
@@ -94,18 +100,59 @@ function PhotoGallery() {
   }, []);
 
   if (loading) {
-    return <div className="gallery-container"><p>Loading photos...</p></div>;
+    return (
+      <div className="gallery-container">
+        <div className="skeleton-gallery-grid">
+          {[...Array(6)].map((_, i) => (
+            <div className="skeleton-gallery-card" key={i}>
+              <div className="skeleton-img"></div>
+              <div className="skeleton-title"></div>
+              <div className="skeleton-desc"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (!activeCategory || !photoCategories[activeCategory]) {
     return <div className="gallery-container"><p>No photos available.</p></div>;
   }
 
+  // For Yearwise, subcategories are years; for Activitywise, subcategories are activities, then subcategories
   const currentCategoryData = photoCategories[activeCategory];
-  const currentSubcategoryData = currentCategoryData.subcategories[activeSubcategory];
+  let subcategoryKeys = [];
+  let subcategoryMap = {};
+  if (activeCategory === 'Yearwise') {
+    subcategoryKeys = Object.keys(currentCategoryData.subcategories).sort((a, b) => b.localeCompare(a)); // Descending year
+    subcategoryMap = currentCategoryData.subcategories;
+  } else if (activeCategory === 'Activitywise') {
+    // Flatten activitywise: show all activities as subcategories, then when one is selected, show its sub-subcategories
+    subcategoryKeys = Object.keys(currentCategoryData.subcategories);
+    subcategoryMap = currentCategoryData.subcategories;
+  }
+
+  // For Activitywise, if a subcategory is selected, show its subcategories as tabs
+  let currentSubcategoryData = null;
+  let subSubcategoryKeys = [];
+  let subSubcategoryMap = {};
+  if (activeCategory === 'Activitywise' && activeSubcategory && subcategoryMap[activeSubcategory]) {
+    subSubcategoryMap = subcategoryMap[activeSubcategory].subcategories;
+    subSubcategoryKeys = subSubcategoryMap ? Object.keys(subSubcategoryMap) : [];
+    // If a sub-subcategory is selected, show its items
+    if (subSubcategoryKeys.length > 0) {
+      // If activeSubSubcategory is not set, default to first
+      if (!window._activeSubSubcategory || !subSubcategoryMap[window._activeSubSubcategory]) {
+        window._activeSubSubcategory = subSubcategoryKeys[0];
+      }
+      currentSubcategoryData = subSubcategoryMap[window._activeSubSubcategory];
+    }
+  } else {
+    currentSubcategoryData = subcategoryMap[activeSubcategory];
+  }
+
   const totalItems = currentSubcategoryData ? currentSubcategoryData.items.length : 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = currentSubcategoryData ? currentSubcategoryData.items.slice(startIndex, endIndex) : [];
@@ -116,12 +163,28 @@ function PhotoGallery() {
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
-    setActiveSubcategory(Object.keys(photoCategories[category].subcategories)[0]);
     setCurrentPage(1);
+    // Set default subcategory
+    const keys = Object.keys(photoCategories[category].subcategories);
+    setActiveSubcategory(keys.length > 0 ? keys[0] : '');
+    // For Activitywise, reset sub-subcategory
+    if (category === 'Activitywise') {
+      window._activeSubSubcategory = null;
+    }
   };
 
   const handleSubcategoryChange = (subcategory) => {
     setActiveSubcategory(subcategory);
+    setCurrentPage(1);
+    // For Activitywise, reset sub-subcategory
+    if (activeCategory === 'Activitywise') {
+      window._activeSubSubcategory = null;
+    }
+  };
+
+  // For Activitywise, handle sub-subcategory
+  const handleSubSubcategoryChange = (subsubcategory) => {
+    window._activeSubSubcategory = subsubcategory;
     setCurrentPage(1);
   };
 
@@ -131,7 +194,7 @@ function PhotoGallery() {
         <h2>Photo Gallery</h2>
         <p className="gallery-intro">Comprehensive collection of photos from our projects, schools, events, and community activities.</p>
 
-        {/* Main Category Tabs */}
+        {/* Main Tabs: Yearwise / Activitywise */}
         <div className="category-tabs">
           {Object.entries(photoCategories).map(([key, category]) => (
             <button
@@ -149,16 +212,31 @@ function PhotoGallery() {
 
         {/* Subcategory Tabs */}
         <div className="subcategory-tabs">
-          {currentCategoryData.subcategories && Object.entries(currentCategoryData.subcategories).map(([key, subcategory]) => (
+          {subcategoryKeys.map((key) => (
             <button
               key={key}
               className={`subcategory-tab ${activeSubcategory === key ? 'active' : ''}`}
               onClick={() => handleSubcategoryChange(key)}
             >
-              {subcategory.title} ({subcategory.items.length})
+              {subcategoryMap[key].title} {subcategoryMap[key].items ? `(${subcategoryMap[key].items.length})` : ''}
             </button>
           ))}
         </div>
+
+        {/* For Activitywise, show sub-subcategory tabs if present */}
+        {activeCategory === 'Activitywise' && subSubcategoryKeys.length > 0 && (
+          <div className="subcategory-tabs">
+            {subSubcategoryKeys.map((key) => (
+              <button
+                key={key}
+                className={`subcategory-tab ${window._activeSubSubcategory === key ? 'active' : ''}`}
+                onClick={() => handleSubSubcategoryChange(key)}
+              >
+                {subSubcategoryMap[key].title} ({subSubcategoryMap[key].items.length})
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Photo Grid */}
         <div className="gallery-grid">
@@ -207,7 +285,7 @@ function PhotoGallery() {
 
         {/* Stats */}
         <div className="gallery-stats">
-          <p>Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} photos in {currentSubcategoryData.title}</p>
+          <p>Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems} photos in {currentSubcategoryData ? currentSubcategoryData.title : ''}</p>
         </div>
       </div>
     </section>
