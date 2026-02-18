@@ -10,14 +10,17 @@ function CorporatePartners() {
     const loadPartners = async () => {
       const data = await getPartners();
       if (data && data.data) {
-        const partnerList = data.data.map(partner => ({
-          name: partner.attributes.name,
-          logo: partner.attributes.logo?.data?.attributes?.url
+        const partnerList = data.data.map(partner => {
+          const name = partner?.attributes?.name || 'Unknown Partner';
+          const logo = partner?.attributes?.logo?.data?.attributes?.url
             ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${partner.attributes.logo.data.attributes.url}`
-            : 'https://via.placeholder.com/180x80?text=Partner'
-        }));
+            : 'https://via.placeholder.com/180x80?text=Partner';
+          return { name, logo };
+        });
         // Duplicate for seamless loop
         setPartners([...partnerList, ...partnerList]);
+      } else {
+        setPartners([]);
       }
       setLoading(false);
     };

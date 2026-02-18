@@ -21,11 +21,22 @@
   margin-top: 20px;
 }
 
-.project-card {
+
+.project-card,
+.project-card-link {
   background: var(--bg);
   padding: 25px;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: block;
+  cursor: pointer;
+}
+
+.project-card-link:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  text-decoration: none;
 }
 
 @media (max-width: 900px) {
