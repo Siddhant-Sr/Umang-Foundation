@@ -182,7 +182,7 @@ import "../styles/Header.css";
 import { getLogo } from "../utils/api";
 
 function Header() {
-  const [logo, setLogo] = useState("");
+  const [logo, setLogo] = useState(process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png");
   const [loading, setLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -195,12 +195,12 @@ function Header() {
         const logoUrl =
           data?.data?.attributes?.logo?.data?.attributes?.url
             ? `${process.env.REACT_APP_STRAPI_URL || "http://localhost:1337"}${data.data.attributes.logo.data.attributes.url}`
-            : "/assets/images/Umang-Foundation-Logo.png";
+            : process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png";
 
         setLogo(logoUrl);
       } catch (err) {
         console.error("Logo load failed", err);
-        setLogo("/assets/images/Umang-Foundation-Logo.png");
+        setLogo(process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png");
       } finally {
         setLoading(false);
       }
