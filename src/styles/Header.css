@@ -312,6 +312,7 @@
   gap: 20px;
   list-style: none;
   align-items: center;
+  white-space: nowrap;
 }
 
 .navbar a,
@@ -352,17 +353,27 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   border-radius: 6px;
   padding: 10px 0;
-  min-width: 200px;
+  min-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown-menu li {
   padding: 0;
+  width: 100%;
 }
 
 .dropdown-menu a {
   display: block;
   padding: 10px 16px;
   font-size: 0.9rem;
+  width: 100%;
+  text-align: left;
 }
 
 .dropdown-menu a:hover {
@@ -434,11 +445,14 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  vertical-align: middle;
 }
 
 .arrow {
   font-size: 0.7rem;
   transition: transform 0.3s ease;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .arrow.rotate {
@@ -512,6 +526,7 @@
     display: block;
   }
 
+    white-space: normal;
   .navbar ul {
     flex-direction: column;
     gap: 15px;
@@ -520,6 +535,8 @@
   .dropdown-menu {
     position: static;
     opacity: 1;
+    min-width: 0;
+    width: 100%;
     visibility: visible;
     transform: none;
     box-shadow: none;

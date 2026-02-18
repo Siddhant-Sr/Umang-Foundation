@@ -186,7 +186,6 @@ function Header() {
   const [loading, setLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const navRef = useRef();
 
   useEffect(() => {
@@ -210,7 +209,7 @@ function Header() {
     loadLogo();
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns and mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target)) {
@@ -218,11 +217,11 @@ function Header() {
         setMobileOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Menu configuration array
   const menuItems = [
     { name: "Home", path: "/" },
     {
@@ -247,10 +246,7 @@ function Header() {
       name: "Story of Change",
       path: "/story-of-change",
       dropdown: [
-        {
-          name: "Impact of Various Social Initiatives",
-          path: "/impact-of-social-initiatives",
-        },
+        { name: "Impact of Various Social Initiatives", path: "/impact-of-social-initiatives" },
       ],
     },
     {
@@ -260,23 +256,14 @@ function Header() {
         { name: "Payment Gateway Link", path: "/payment-gateway" },
         { name: "Membership", path: "/membership" },
         { name: "CSR Partnership", path: "/csr-partnership" },
-        {
-          name: "Celebration of Birthday and Special Occasions",
-          path: "/birthday-celebrations",
-        },
+        { name: "Celebration of Birthday and Special Occasions", path: "/birthday-celebrations" },
       ],
     },
     {
       name: "Gallery",
       dropdown: [
-        {
-          name: "Photo Gallery",
-          path: "/photo-gallery",
-        },
-        {
-          name: "Media Gallery",
-          path: "/media-gallery",
-        },
+        { name: "Photo Gallery", path: "/photo-gallery" },
+        { name: "Media Gallery", path: "/media-gallery" },
       ],
     },
     { name: "Corporate Partners", path: "/corporate-partners" },
@@ -288,69 +275,64 @@ function Header() {
     return <header className="header">Loading...</header>;
   }
 
+  // Responsive width detection
+  const isMobile = () => window.innerWidth <= 992;
+
   return (
     <header className="header" ref={navRef}>
       <div className="header-container">
         <div className="logo">
           <Link to="/">
-            <img src={logo} alt="Umang Foundation Logo" />
+            <img src={logo} alt="Umang Foundation Logo" className="logo-image" />
           </Link>
         </div>
-
         <div
-          className={`hamburger ${mobileOpen ? "open" : ""}`}
-          onClick={() => setMobileOpen(!mobileOpen)}
+          className={`hamburger${mobileOpen ? " open" : ""}`}
+          onClick={() => setMobileOpen((prev) => !prev)}
+          aria-label="Toggle navigation menu"
         >
           <span></span>
           <span></span>
           <span></span>
         </div>
-
-        <nav className={`navbar ${mobileOpen ? "active" : ""}`}>
-          <ul>
-            {menuItems.map((item, index) => (
+        <nav className={`navbar${mobileOpen ? " active" : ""}`}>
+          <ul >
+            {menuItems.map((item, idx) => (
               <li
-                key={index}
-                className="nav-item"
-                onMouseEnter={() => window.innerWidth > 992 && setActiveDropdown(index)}
-                onMouseLeave={() => window.innerWidth > 992 && setActiveDropdown(null)}
+                key={item.name}
+                className={`nav-item${item.dropdown ? " dropdown" : ""}`}
+                onMouseEnter={() => {
+                  if (!isMobile() && item.dropdown) setActiveDropdown(idx);
+                }}
+                onMouseLeave={() => {
+                  if (!isMobile() && item.dropdown) setActiveDropdown(null);
+                }}
               >
                 {item.dropdown ? (
                   <>
                     <div
                       className="dropdown-toggle"
-                      onClick={() =>
-                        window.innerWidth <= 992 &&
-                        setActiveDropdown(
-                          activeDropdown === index ? null : index
-                        )
-                      }
+                      onClick={() => {
+                        if (isMobile()) setActiveDropdown(activeDropdown === idx ? null : idx);
+                      }}
+                      style={{ display: "flex", alignItems: "center", gap: 4 }}
                     >
                       {item.name}
-                      <span
-                        className={`arrow ${
-                          activeDropdown === index ? "rotate" : ""
-                        }`}
-                      >
-                        ▼
-                      </span>
+                      <span className={`arrow${activeDropdown === idx ? " rotate" : ""}`}>▼</span>
                     </div>
-
-                    <ul
-                      className={`dropdown-menu ${
-                        activeDropdown === index ? "show" : ""
-                      }`}
+                    <ul className={`dropdown-menu${activeDropdown === idx ? " show" : ""}`}
+                      style={{ flexDirection: "column" }}
                     >
-                      {item.dropdown.map((subItem, subIndex) => (
-                        <li key={subIndex}>
+                      {item.dropdown.map((sub, subIdx) => (
+                        <li key={sub.name}>
                           <Link
-                            to={subItem.path}
+                            to={sub.path}
                             onClick={() => {
                               setMobileOpen(false);
                               setActiveDropdown(null);
                             }}
                           >
-                            {subItem.name}
+                            {sub.name}
                           </Link>
                         </li>
                       ))}
