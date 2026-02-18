@@ -13,9 +13,9 @@ function PhotoGallery() {
   useEffect(() => {
     const loadPhotos = async () => {
       const data = await fetchData('/photos?populate=*');
-      if (data && data.data) {
+      let grouped = {};
+      if (data && data.data && data.data.length > 0) {
         // Group photos by category and subcategory
-        const grouped = {};
         data.data.forEach(photo => {
           const cat = photo.attributes.category;
           const subcat = photo.attributes.subcategory;
@@ -44,13 +44,48 @@ function PhotoGallery() {
             date: photo.attributes.date || '2024-01-01'
           });
         });
-        setPhotoCategories(grouped);
-        if (Object.keys(grouped).length > 0) {
-          const firstCat = Object.keys(grouped)[0];
-          setActiveCategory(firstCat);
-          if (grouped[firstCat].subcategories && Object.keys(grouped[firstCat].subcategories).length > 0) {
-            setActiveSubcategory(Object.keys(grouped[firstCat].subcategories)[0]);
+      } else {
+        // Fallback dummy data
+        grouped = {
+          "yearwise": {
+            title: "Yearwise",
+            description: "Photos from Yearwise Activities",
+            subcategories: {
+              "2025": {
+                title: "2025",
+                items: [
+                  { id: 1, src: "https://via.placeholder.com/400x300?text=2025+Event+1", alt: "2025 Event 1", location: "Delhi", date: "2025-01-10" },
+                  { id: 2, src: "https://via.placeholder.com/400x300?text=2025+Event+2", alt: "2025 Event 2", location: "Mumbai", date: "2025-02-15" }
+                ]
+              },
+              "2024": {
+                title: "2024",
+                items: [
+                  { id: 3, src: "https://via.placeholder.com/400x300?text=2024+Event+1", alt: "2024 Event 1", location: "Kolkata", date: "2024-03-20" }
+                ]
+              }
+            }
+          },
+          "activitywise": {
+            title: "Activitywise",
+            description: "Photos from Activitywise Events",
+            subcategories: {
+              "Blood Donation": {
+                title: "Blood Donation",
+                items: [
+                  { id: 4, src: "https://via.placeholder.com/400x300?text=Blood+Donation", alt: "Blood Donation Camp", location: "Chennai", date: "2025-04-05" }
+                ]
+              }
+            }
           }
+        };
+      }
+      setPhotoCategories(grouped);
+      if (Object.keys(grouped).length > 0) {
+        const firstCat = Object.keys(grouped)[0];
+        setActiveCategory(firstCat);
+        if (grouped[firstCat].subcategories && Object.keys(grouped[firstCat].subcategories).length > 0) {
+          setActiveSubcategory(Object.keys(grouped[firstCat].subcategories)[0]);
         }
       }
       setLoading(false);

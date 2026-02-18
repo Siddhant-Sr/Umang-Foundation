@@ -12,9 +12,9 @@ function MediaGallery() {
   useEffect(() => {
     const loadMedia = async () => {
       const data = await fetchData('/media?populate=*');
-      if (data && data.data) {
+      let grouped = {};
+      if (data && data.data && data.data.length > 0) {
         // Group media by category
-        const grouped = {};
         data.data.forEach(media => {
           const cat = media.attributes.category;
           const imgUrl = media.attributes.image?.data?.attributes?.url
@@ -34,10 +34,33 @@ function MediaGallery() {
             date: media.attributes.date || '2024-01-01'
           });
         });
-        setMediaCategories(grouped);
-        if (Object.keys(grouped).length > 0) {
-          setActiveCategory(Object.keys(grouped)[0]);
-        }
+      } else {
+        // Fallback dummy data
+        grouped = {
+          "newspapers": {
+            title: "Newspapers",
+            items: [
+              { id: 1, src: "https://via.placeholder.com/400x300?text=Newspaper+1", alt: "Newspaper Clipping 1", date: "2025-01-10" },
+              { id: 2, src: "https://via.placeholder.com/400x300?text=Newspaper+2", alt: "Newspaper Clipping 2", date: "2025-02-15" }
+            ]
+          },
+          "online": {
+            title: "Online",
+            items: [
+              { id: 3, src: "https://via.placeholder.com/400x300?text=Online+Media+1", alt: "Online Media 1", date: "2025-03-20" }
+            ]
+          },
+          "youtube": {
+            title: "YouTube",
+            items: [
+              { id: 4, src: "https://via.placeholder.com/400x300?text=YouTube+Video", alt: "YouTube Video", date: "2025-04-05" }
+            ]
+          }
+        };
+      }
+      setMediaCategories(grouped);
+      if (Object.keys(grouped).length > 0) {
+        setActiveCategory(Object.keys(grouped)[0]);
       }
       setLoading(false);
     };
