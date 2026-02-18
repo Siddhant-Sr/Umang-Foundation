@@ -14,7 +14,7 @@ function PhotoGallery() {
   useEffect(() => {
     const loadPhotos = async () => {
       const data = await fetchData('/photos?populate=*');
-      let grouped = {};
+      // let grouped = {};
       if (data && data.data && data.data.length > 0) {
         // Group by year
         const yearwise = {};

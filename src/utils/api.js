@@ -1,7 +1,7 @@
 
 const RENDER_API_URL = 'https://umang-backend-ty0e.onrender.com';
 const LOCAL_API_URL = 'http://localhost:1337';
-const API_BASE_URL = process.env.REACT_APP_STRAPI_URL || RENDER_API_URL;
+// const API_BASE_URL = process.env.REACT_APP_STRAPI_URL || RENDER_API_URL;
 
 // Dummy placeholder data for development fallback
 const dummyProjects = [
@@ -43,7 +43,7 @@ const dummyPartners = [
 export const fetchData = async (endpoint, { fallback = null } = {}) => {
   // Try Render API first, then localhost, then dummy data (in dev)
   const urlsToTry = [RENDER_API_URL, LOCAL_API_URL];
-  let lastError = null;
+  // let lastError = null;
   for (const base of urlsToTry) {
     try {
       const url = `${base}/api${endpoint}`;
@@ -54,7 +54,7 @@ export const fetchData = async (endpoint, { fallback = null } = {}) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      lastError = error;
+      // lastError = error;
     }
   }
   if (process.env.NODE_ENV === 'development' && fallback) {
