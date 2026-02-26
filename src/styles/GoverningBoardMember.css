@@ -34,9 +34,19 @@
 
 .board-members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 30px;
   margin-top: 30px;
+}
+
+/* Single board member takes full width */
+.board-members-grid.single-trustee {
+  grid-template-columns: 1fr;
+}
+
+.board-members-grid.single-trustee .board-member-card {
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .board-member-card {
@@ -54,14 +64,19 @@
 
 .board-member-image {
   width: 100%;
-  height: 200px;
+  height: 300px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
 }
 
 .board-member-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.3s ease;
 }
 
@@ -90,6 +105,64 @@
   color: var(--text);
   line-height: 1.6;
   font-size: 0.95rem;
+}
+
+.board-member-description p {
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.board-member-description p:last-child {
+  margin-bottom: 0;
+}
+
+.board-member-contact {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.board-member-contact-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.board-member-contact-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.board-member-linkedin {
+  display: inline-block;
+  padding: 5px 12px;
+  background-color: #0077b5;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.board-member-linkedin:hover {
+  background-color: #005885;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.no-board-members {
+  text-align: center;
+  padding: 40px;
+  color: var(--text);
+  font-size: 1.1rem;
 }
 
 @media (max-width: 768px) {
