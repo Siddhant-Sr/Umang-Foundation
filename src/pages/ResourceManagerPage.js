@@ -1,12 +1,22 @@
 import React from 'react';
+import ResourceManager from '../components/ResourceManager';
+import '../styles/ProjectPages.css';
 
-function ResourceManager() {
+function ResourceManagerPage() {
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Resource Manager</h1>
-      <p>This is a placeholder page for Resource Manager. API integration coming soon.</p>
+    <div className="page-container">
+      <div className="page-header">
+        <h1>Resource Manager</h1>
+        <p>Access important organizational documents, reports, and compliance records.</p>
+      </div>
+
+      <div className="page-content">
+        <section className="resource-manager-section">
+          <ResourceManager />
+        </section>
+      </div>
     </div>
   );
 }
 
-export default ResourceManager;
+export default ResourceManagerPage;
