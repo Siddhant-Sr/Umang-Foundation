@@ -36,21 +36,9 @@
 .trustees-grid,
 .board-members-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 30px;
   margin-top: 30px;
-}
-
-/* Single trustee takes full width */
-.trustees-grid.single-trustee,
-.board-members-grid.single-trustee {
-  grid-template-columns: 1fr;
-}
-
-.trustees-grid.single-trustee .trustee-card,
-.board-members-grid.single-trustee .board-member-card {
-  max-width: 500px;
-  margin: 0 auto;
 }
 
 .trustee-card,
@@ -60,6 +48,8 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: grid;
+  grid-template-columns: 300px 1fr;
 }
 
 .trustee-card:hover,
@@ -71,7 +61,8 @@
 .trustee-image,
 .board-member-image {
   width: 100%;
-  height: 300px;
+  height: 100%;
+  min-height: 300px;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -185,9 +176,14 @@
     font-size: 2rem;
   }
 
-  .trustees-grid,
-  .board-members-grid {
+  .trustee-card,
+  .board-member-card {
     grid-template-columns: 1fr;
+  }
+
+  .trustee-image,
+  .board-member-image {
+    min-height: 260px;
   }
 
   .trustee-card,

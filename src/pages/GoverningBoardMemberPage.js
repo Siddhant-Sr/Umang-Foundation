@@ -94,7 +94,7 @@ function GoverningBoardMemberPage() {
         <section className="board-members-section">
           <h2>Our Governing Board Members</h2>
           {boardMembers.length > 0 ? (
-            <div className={`board-members-grid ${boardMembers.length === 1 ? 'single-trustee' : ''}`}>
+            <div className="board-members-grid">
               {boardMembers.map((boardMember) => (
                 <div className="board-member-card" key={boardMember.id}>
                   <div className="board-member-image">

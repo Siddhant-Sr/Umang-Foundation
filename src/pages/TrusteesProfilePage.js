@@ -94,7 +94,7 @@ function TrusteesProfilePage() {
         <section className="trustees-section">
           <h2>Our Trustees</h2>
           {trustees.length > 0 ? (
-            <div className={`trustees-grid ${trustees.length === 1 ? 'single-trustee' : ''}`}>
+            <div className="trustees-grid">
               {trustees.map((trustee) => (
                 <div className="trustee-card" key={trustee.id}>
                   <div className="trustee-image">
