@@ -192,14 +192,17 @@ function Header() {
     const loadLogo = async () => {
       try {
         const data = await getLogo();
-        const logoUrl =
-          data?.data?.attributes?.logo?.data?.attributes?.url
-            ? `${process.env.REACT_APP_STRAPI_URL || "http://localhost:1337"}${data.data.attributes.logo.data.attributes.url}`
-            : process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png";
+        const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || "http://localhost:1337";
+        const logoPath =
+          data?.data?.attributes?.logo?.data?.attributes?.url ||
+          data?.data?.logo?.data?.attributes?.url ||
+          data?.data?.logo?.url;
+        const logoUrl = logoPath
+          ? (logoPath.startsWith('/') ? `${baseUrl}${logoPath}` : logoPath)
+          : process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png";
 
         setLogo(logoUrl);
-      } catch (err) {
-        console.error("Logo load failed", err);
+      } catch {
         setLogo(process.env.PUBLIC_URL + "/assets/images/Umang-Foundation-Logo.png");
       } finally {
         setLoading(false);

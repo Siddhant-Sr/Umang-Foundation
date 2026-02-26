@@ -9,11 +9,15 @@ function CorporatePartners() {
   useEffect(() => {
     const loadPartners = async () => {
       const data = await getPartners();
+      const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
       if (data && data.data) {
-        const partnerList = data.data.map(partner => {
-          const name = partner?.attributes?.name || 'Unknown Partner';
-          const logo = partner?.attributes?.logo?.data?.attributes?.url
-            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${partner.attributes.logo.data.attributes.url}`
+        const partnerList = data.data.map((partner) => {
+          const attrs = partner?.attributes || partner;
+          const logoObj = attrs?.logo?.data?.attributes || attrs?.logo;
+          const logoPath = logoObj?.url;
+          const name = attrs?.name || 'Unknown Partner';
+          const logo = logoPath
+            ? (logoPath.startsWith('/') ? `${baseUrl}${logoPath}` : logoPath)
             : 'https://via.placeholder.com/180x80?text=Partner';
           return { name, logo };
         });

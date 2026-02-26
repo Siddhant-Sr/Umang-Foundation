@@ -71,7 +71,7 @@ export const fetchData = async (endpoint, { fallback = null } = {}) => {
 // Specific API functions
 export const getProjects = () =>
   fetchData('/projects?populate=*', { fallback: dummyProjects });
-export const getProjectBySlug = (slug) => fetchData(`/projects?filters[slug][$eq]=${slug}&populate=*`);
+export const getProjectBySlug = (slug) => fetchData(`/projects?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`);
 export const getSchools = () => fetchData('/schools?populate=*');
 export const getMedia = () => fetchData('/medias?populate=*');
 export const getPartners = () => fetchData('/partners?populate=*', { fallback: dummyPartners });

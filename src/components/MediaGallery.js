@@ -14,22 +14,29 @@ function MediaGallery() {
   useEffect(() => {
     const loadMedia = async () => {
       const data = await fetchData('/videos?populate=*');
+      const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
+      const toAbsoluteUrl = (url) => {
+        if (!url) return '';
+        return url.startsWith('/') ? `${baseUrl}${url}` : url;
+      };
       let grouped = { Newspaper: { title: 'Newspaper', items: [] }, Youtube: { title: 'YouTube', items: [] } };
       if (data && data.data && data.data.length > 0) {
-        data.data.forEach(item => {
+        data.data.forEach(rawItem => {
+          const item = rawItem?.attributes || rawItem;
           if (item.type === 'newspaper') {
             // Newspaper: use thumbnail if available
+            const thumbnail = item.thumbnail?.data?.attributes || item.thumbnail;
             let imgUrl = '';
-            if (item.thumbnail && item.thumbnail.formats) {
-              if (item.thumbnail.formats.small) {
-                imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${item.thumbnail.formats.small.url}`;
-              } else if (item.thumbnail.formats.thumbnail) {
-                imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${item.thumbnail.formats.thumbnail.url}`;
-              } else if (item.thumbnail.url) {
-                imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${item.thumbnail.url}`;
+            if (thumbnail?.formats) {
+              if (thumbnail.formats.small?.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.formats.small.url);
+              } else if (thumbnail.formats.thumbnail?.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.formats.thumbnail.url);
+              } else if (thumbnail.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.url);
               }
-            } else if (item.thumbnail && item.thumbnail.url) {
-              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${item.thumbnail.url}`;
+            } else if (thumbnail?.url) {
+              imgUrl = toAbsoluteUrl(thumbnail.url);
             } else {
               imgUrl = 'https://via.placeholder.com/400x300?text=No+Image';
             }

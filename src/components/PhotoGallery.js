@@ -14,26 +14,33 @@ function PhotoGallery() {
   useEffect(() => {
     const loadPhotos = async () => {
       const data = await fetchData('/photos?populate=*');
+      const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
+      const toAbsoluteUrl = (url) => {
+        if (!url) return '';
+        return url.startsWith('/') ? `${baseUrl}${url}` : url;
+      };
       // let grouped = {};
       if (data && data.data && data.data.length > 0) {
         // Group by year
         const yearwise = {};
         // Group by activity/category
         const activitywise = {};
-        data.data.forEach(photo => {
+        data.data.forEach(rawPhoto => {
+          const photo = rawPhoto?.attributes || rawPhoto;
           // Yearwise
           const year = photo.date ? String(new Date(photo.date).getFullYear()) : 'Unknown';
+          const image = photo.image?.data?.attributes || photo.image;
           let imgUrl = '';
-          if (photo.image && photo.image.formats) {
-            if (photo.image.formats.thumbnail) {
-              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.thumbnail.url}`;
-            } else if (photo.image.formats.small) {
-              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.formats.small.url}`;
-            } else if (photo.image.url) {
-              imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+          if (image?.formats) {
+            if (image.formats.thumbnail?.url) {
+              imgUrl = toAbsoluteUrl(image.formats.thumbnail.url);
+            } else if (image.formats.small?.url) {
+              imgUrl = toAbsoluteUrl(image.formats.small.url);
+            } else if (image.url) {
+              imgUrl = toAbsoluteUrl(image.url);
             }
-          } else if (photo.image && photo.image.url) {
-            imgUrl = `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${photo.image.url}`;
+          } else if (image?.url) {
+            imgUrl = toAbsoluteUrl(image.url);
           } else {
             imgUrl = 'https://via.placeholder.com/400x300?text=No+Image';
           }
@@ -53,8 +60,8 @@ function PhotoGallery() {
           });
 
           // Activitywise
-          const cat = photo.category;
-          const subcat = photo.subcategory;
+          const cat = photo.category || 'Uncategorized';
+          const subcat = photo.subcategory || 'General';
           if (!activitywise[cat]) {
             activitywise[cat] = {
               title: cat,

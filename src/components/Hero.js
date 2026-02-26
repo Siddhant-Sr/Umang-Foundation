@@ -12,14 +12,14 @@ function Hero() {
   useEffect(() => {
     const loadHeroImages = async () => {
       const data = await getHeroImages();
+      const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || 'https://umang-backend-ty0e.onrender.com';
       if (data && Array.isArray(data.data)) {
-        const imgUrls = data.data.map(img => {
-          // For Strapi v4 API response structure
-          const imageObj = img?.image;
+        const imgUrls = data.data.map((img) => {
+          const entity = img?.attributes || img;
+          const imageObj = entity?.image?.data?.attributes || entity?.image;
           let imageUrl = imageObj?.url;
-          // If imageUrl is relative, prepend API base
           if (imageUrl && imageUrl.startsWith('/')) {
-            imageUrl = `${process.env.REACT_APP_STRAPI_URL || 'https://umang-backend-ty0e.onrender.com'}${imageUrl}`;
+            imageUrl = `${baseUrl}${imageUrl}`;
           }
           if (imageUrl) {
             return imageUrl;
