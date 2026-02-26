@@ -12,12 +12,21 @@ function Hero() {
   useEffect(() => {
     const loadHeroImages = async () => {
       const data = await getHeroImages();
-      if (data && data.data) {
-        const imgUrls = data.data.map(img => 
-          img.attributes.image?.data?.attributes?.url
-            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${img.attributes.image.data.attributes.url}`
-            : 'https://via.placeholder.com/800x400?text=Hero+Image'
-        );
+      if (data && Array.isArray(data.data)) {
+        const imgUrls = data.data.map(img => {
+          // For Strapi v4 API response structure
+          const imageObj = img?.image;
+          let imageUrl = imageObj?.url;
+          // If imageUrl is relative, prepend API base
+          if (imageUrl && imageUrl.startsWith('/')) {
+            imageUrl = `${process.env.REACT_APP_STRAPI_URL || 'https://umang-backend-ty0e.onrender.com'}${imageUrl}`;
+          }
+          if (imageUrl) {
+            return imageUrl;
+          } else {
+            return 'https://via.placeholder.com/800x400?text=Hero+Image';
+          }
+        });
         setImages(imgUrls);
       } else {
         // Fallback to placeholders
