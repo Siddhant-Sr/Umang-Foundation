@@ -52,14 +52,17 @@ export const fetchData = async (endpoint, { fallback = null } = {}) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data;
+      if (data && data.data && Array.isArray(data.data) && data.data.length === 0) {
+        continue;
+      }
+      return { ...data, _baseUrl: base };
     } catch (error) {
       // lastError = error;
     }
   }
   if (process.env.NODE_ENV === 'development' && fallback) {
     // Return dummy data in development if both APIs fail
-    return { data: fallback };
+    return { data: fallback, _baseUrl: LOCAL_API_URL };
   }
   // For production, return null or handle as needed
   return null;
