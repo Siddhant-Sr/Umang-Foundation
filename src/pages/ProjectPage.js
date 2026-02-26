@@ -29,12 +29,14 @@ function ProjectPage() {
   const { slug } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [apiBaseUrl, setApiBaseUrl] = useState('');
 
   useEffect(() => {
     const loadProject = async () => {
       let data = await getProjectBySlug(slug);
       if (data && data.data && data.data.length > 0) {
         setProject(data.data[0]);
+        setApiBaseUrl(data._baseUrl || '');
       } else {
         // Fallback: try to find by id or generated slug
         const all = await getProjects();
@@ -54,7 +56,10 @@ function ProjectPage() {
             }
             return false;
           });
-          if (found) setProject(found);
+          if (found) {
+            setProject(found);
+            setApiBaseUrl(all._baseUrl || '');
+          }
         }
       }
       setLoading(false);
@@ -83,11 +88,16 @@ function ProjectPage() {
   }
 
   const attributes = project.attributes || project;
+  const baseUrl = apiBaseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
   // Defensive: Only map images if images exists and is an array
   const images = Array.isArray(attributes.images?.data)
-    ? attributes.images.data.map(img =>
-        `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${img.attributes.url}`
-      )
+    ? attributes.images.data
+        .map((img) => {
+          const imagePath = img?.attributes?.url || img?.url;
+          if (!imagePath) return null;
+          return imagePath.startsWith('/') ? `${baseUrl}${imagePath}` : imagePath;
+        })
+        .filter(Boolean)
     : [];
 
   return (

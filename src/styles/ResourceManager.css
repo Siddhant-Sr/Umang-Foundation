@@ -1,0 +1,134 @@
+.resource-manager-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #eef2f6 100%);
+  padding: 24px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 108, 181, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.resource-manager-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.resource-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.resource-column h2 {
+  color: var(--muted);
+  font-size: 2rem;
+  line-height: 1.25;
+  margin: 0 0 2px;
+}
+
+.resource-column {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 18px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.resource-subtitle {
+  color: #6f6f6f;
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.resource-column ol {
+  padding-left: 24px;
+  margin: 0;
+}
+
+.resource-column li {
+  color: #164d16;
+  font-size: 1rem;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.resource-column a,
+.resource-column span {
+  color: #ff4a00;
+  font-size: 1rem;
+}
+
+.resource-column a:hover {
+  text-decoration: underline;
+}
+
+.resource-loading,
+.resource-error,
+.resource-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 1.1rem;
+  padding: 40px 12px;
+}
+
+@media (max-width: 1280px) {
+  .resource-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .resource-column h2 {
+    font-size: 1.75rem;
+  }
+
+  .resource-subtitle {
+    font-size: 1rem;
+  }
+
+  .resource-column li {
+    font-size: 0.98rem;
+  }
+
+  .resource-column a,
+  .resource-column span {
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .resource-manager-page {
+    padding: 24px 12px;
+  }
+
+  .resource-column {
+    padding: 14px 12px;
+  }
+
+  .resource-columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .resource-column h2 {
+      font-size: 1.45rem;
+  }
+
+  .resource-subtitle {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+  }
+
+  .resource-column ol {
+      padding-left: 20px;
+  }
+
+  .resource-column li {
+      font-size: 0.92rem;
+      margin-bottom: 7px;
+  }
+
+  .resource-column a,
+  .resource-column span {
+      font-size: 0.92rem;
+  }
+}

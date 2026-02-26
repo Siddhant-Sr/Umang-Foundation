@@ -52,14 +52,17 @@ export const fetchData = async (endpoint, { fallback = null } = {}) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      return data;
+      if (data && data.data && Array.isArray(data.data) && data.data.length === 0) {
+        continue;
+      }
+      return { ...data, _baseUrl: base };
     } catch (error) {
       // lastError = error;
     }
   }
   if (process.env.NODE_ENV === 'development' && fallback) {
     // Return dummy data in development if both APIs fail
-    return { data: fallback };
+    return { data: fallback, _baseUrl: LOCAL_API_URL };
   }
   // For production, return null or handle as needed
   return null;
@@ -68,7 +71,7 @@ export const fetchData = async (endpoint, { fallback = null } = {}) => {
 // Specific API functions
 export const getProjects = () =>
   fetchData('/projects?populate=*', { fallback: dummyProjects });
-export const getProjectBySlug = (slug) => fetchData(`/projects?filters[slug][$eq]=${slug}&populate=*`);
+export const getProjectBySlug = (slug) => fetchData(`/projects?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`);
 export const getSchools = () => fetchData('/schools?populate=*');
 export const getMedia = () => fetchData('/medias?populate=*');
 export const getPartners = () => fetchData('/partners?populate=*', { fallback: dummyPartners });
@@ -79,3 +82,4 @@ export const getYouTubeLinks = () => fetchData('/youtube-links?populate=*');
 export const getCorporateLogos = () => fetchData('/corporate-logos?populate=*');
 export const getHeroImages = () => fetchData('/hero-images?populate=*');
 export const getLogo = () => fetchData('/logo?populate=*');
+export const getResourceManagers = () => fetchData('/resource-managers?populate=*');

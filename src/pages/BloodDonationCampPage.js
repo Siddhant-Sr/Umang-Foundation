@@ -10,9 +10,12 @@ function BloodDonationCampPage() {
     const loadPageData = async () => {
       const data = await fetchData('/blood-donation-page?populate=*');
       if (data && data.data) {
-        const attributes = data.data.attributes;
-        const imgUrl = attributes.image?.data?.attributes?.url
-          ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${attributes.image.data.attributes.url}`
+        const baseUrl = data._baseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
+        const attributes = data.data.attributes || data.data;
+        const imageObj = attributes.image?.data?.attributes || attributes.image;
+        const imagePath = imageObj?.url;
+        const imgUrl = imagePath
+          ? (imagePath.startsWith('/') ? `${baseUrl}${imagePath}` : imagePath)
           : 'https://via.placeholder.com/400x300?text=Blood+Donation+Camp';
         setPageData({
           title: attributes.title || 'Blood Donation Camp',

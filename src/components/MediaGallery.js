@@ -8,61 +8,66 @@ function MediaGallery() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalImage, setModalImage] = useState(null);
   const itemsPerPage = 12;
 
   useEffect(() => {
     const loadMedia = async () => {
-      const data = await fetchData('/media?populate=*');
-      let grouped = {};
+      const data = await fetchData('/videos?populate=*');
+      const baseUrl = data?._baseUrl || process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337';
+      const toAbsoluteUrl = (url) => {
+        if (!url) return '';
+        return url.startsWith('/') ? `${baseUrl}${url}` : url;
+      };
+      let grouped = { Newspaper: { title: 'Newspaper', items: [] }, Youtube: { title: 'YouTube', items: [] } };
       if (data && data.data && data.data.length > 0) {
-        // Group media by category
-        data.data.forEach(media => {
-          const cat = media.attributes.category;
-          const imgUrl = media.attributes.image?.data?.attributes?.url
-            ? `${process.env.REACT_APP_STRAPI_URL || 'http://localhost:1337'}${media.attributes.image.data.attributes.url}`
-            : 'https://via.placeholder.com/400x300?text=No+Image';
-
-          if (!grouped[cat]) {
-            grouped[cat] = {
-              title: cat.charAt(0).toUpperCase() + cat.slice(1),
-              items: []
-            };
+        data.data.forEach(rawItem => {
+          const item = rawItem?.attributes || rawItem;
+          if (item.type === 'newspaper') {
+            // Newspaper: use thumbnail if available
+            const thumbnail = item.thumbnail?.data?.attributes || item.thumbnail;
+            let imgUrl = '';
+            if (thumbnail?.formats) {
+              if (thumbnail.formats.small?.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.formats.small.url);
+              } else if (thumbnail.formats.thumbnail?.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.formats.thumbnail.url);
+              } else if (thumbnail.url) {
+                imgUrl = toAbsoluteUrl(thumbnail.url);
+              }
+            } else if (thumbnail?.url) {
+              imgUrl = toAbsoluteUrl(thumbnail.url);
+            } else {
+              imgUrl = 'https://via.placeholder.com/400x300?text=No+Image';
+            }
+            grouped.Newspaper.items.push({
+              id: item.id,
+              src: imgUrl,
+              alt: item.title || 'Newspaper',
+              date: item.uploadeddate || '',
+              title: item.title || '',
+            });
+          } else if (item.type === 'youtube') {
+            // YouTube: get thumbnail from url
+            let youtubeId = '';
+            const match = item.url && item.url.match(/[?&]v=([^&#]+)/);
+            if (match) youtubeId = match[1];
+            const imgUrl = youtubeId
+              ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+              : 'https://via.placeholder.com/400x300?text=YouTube+Video';
+            grouped.Youtube.items.push({
+              id: item.id,
+              src: imgUrl,
+              alt: item.title || 'YouTube Video',
+              date: item.uploadeddate || '',
+              title: item.title || '',
+              url: item.url
+            });
           }
-          grouped[cat].items.push({
-            id: media.id,
-            src: imgUrl,
-            alt: media.attributes.alt || 'Media',
-            date: media.attributes.date || '2024-01-01'
-          });
         });
-      } else {
-        // Fallback dummy data
-        grouped = {
-          "newspapers": {
-            title: "Newspapers",
-            items: [
-              { id: 1, src: "https://via.placeholder.com/400x300?text=Newspaper+1", alt: "Newspaper Clipping 1", date: "2025-01-10" },
-              { id: 2, src: "https://via.placeholder.com/400x300?text=Newspaper+2", alt: "Newspaper Clipping 2", date: "2025-02-15" }
-            ]
-          },
-          "online": {
-            title: "Online",
-            items: [
-              { id: 3, src: "https://via.placeholder.com/400x300?text=Online+Media+1", alt: "Online Media 1", date: "2025-03-20" }
-            ]
-          },
-          "youtube": {
-            title: "YouTube",
-            items: [
-              { id: 4, src: "https://via.placeholder.com/400x300?text=YouTube+Video", alt: "YouTube Video", date: "2025-04-05" }
-            ]
-          }
-        };
       }
       setMediaCategories(grouped);
-      if (Object.keys(grouped).length > 0) {
-        setActiveCategory(Object.keys(grouped)[0]);
-      }
+      setActiveCategory('Newspaper');
       setLoading(false);
     };
     loadMedia();
@@ -127,15 +132,93 @@ function MediaGallery() {
         {/* Media Grid */}
         <div className="gallery-grid">
           {currentItems.map((item) => (
-            <div className="gallery-item" key={item.id}>
-              <img src={item.src} alt={item.alt} loading="lazy" />
-              <div className="item-overlay">
-                <p className="item-date">{new Date(item.date).toLocaleDateString()}</p>
-                <p className="item-description">{item.alt}</p>
+            activeCategory === 'Youtube' ? (
+              <a
+                className="gallery-item"
+                key={item.id}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <img src={item.src} alt={item.alt} loading="lazy" />
+                <div className="item-overlay">
+                  <p className="item-date">{item.date ? new Date(item.date).toLocaleDateString() : ''}</p>
+                  <p className="item-description">{item.title}</p>
+                </div>
+              </a>
+            ) : (
+              <div
+                className="gallery-item"
+                key={item.id}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setModalImage(item.src)}
+                tabIndex={0}
+                role="button"
+                aria-label="Enlarge newspaper image"
+              >
+                <img src={item.src} alt={item.alt} loading="lazy" />
+                <div className="item-overlay">
+                  <p className="item-date">{item.date ? new Date(item.date).toLocaleDateString() : ''}</p>
+                  <p className="item-description">{item.title}</p>
+                </div>
               </div>
-            </div>
+            )
           ))}
         </div>
+
+        {/* Modal for enlarged image */}
+        {modalImage && (
+          <div
+            className="modal-overlay"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(0,0,0,0.85)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999
+            }}
+            onClick={() => setModalImage(null)}
+          >
+            <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+              <button
+                onClick={() => setModalImage(null)}
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  background: 'rgba(0,0,0,0.7)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 32,
+                  height: 32,
+                  fontSize: 22,
+                  cursor: 'pointer',
+                  zIndex: 2
+                }}
+                aria-label="Close enlarged image"
+              >
+                ×
+              </button>
+              <img
+                src={modalImage}
+                alt="Enlarged newspaper"
+                style={{
+                  maxWidth: '90vw',
+                  maxHeight: '85vh',
+                  borderRadius: 8,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (

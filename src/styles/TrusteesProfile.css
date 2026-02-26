@@ -36,7 +36,7 @@
 .trustees-grid,
 .board-members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: 30px;
   margin-top: 30px;
 }
@@ -48,6 +48,8 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: grid;
+  grid-template-columns: 300px 1fr;
 }
 
 .trustee-card:hover,
@@ -59,15 +61,21 @@
 .trustee-image,
 .board-member-image {
   width: 100%;
-  height: 200px;
+  height: 100%;
+  min-height: 300px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
 }
 
 .trustee-image img,
 .board-member-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.3s ease;
 }
 
@@ -103,14 +111,79 @@
   font-size: 0.95rem;
 }
 
+.trustee-description p,
+.board-member-description p {
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.trustee-description p:last-child,
+.board-member-description p:last-child {
+  margin-bottom: 0;
+}
+
+.trustee-contact {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.trustee-contact-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.trustee-contact-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.trustee-linkedin {
+  display: inline-block;
+  padding: 5px 12px;
+  background-color: #0077b5;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.trustee-linkedin:hover {
+  background-color: #005885;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.no-trustees {
+  text-align: center;
+  padding: 40px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
 @media (max-width: 768px) {
   .page-header h1 {
     font-size: 2rem;
   }
 
-  .trustees-grid,
-  .board-members-grid {
+  .trustee-card,
+  .board-member-card {
     grid-template-columns: 1fr;
+  }
+
+  .trustee-image,
+  .board-member-image {
+    min-height: 260px;
   }
 
   .trustee-card,
