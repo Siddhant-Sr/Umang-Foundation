@@ -11,6 +11,7 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectPage from './pages/ProjectPage';
 import InternshipPage from './pages/InternshipPage';
 import AssociatedSchoolsPage from './pages/AssociatedSchoolsPage';
+import AssociatedCollegesPage from './pages/AssociatedCollegesPage';
 import StoryOfChangePage from './pages/StoryOfChangePage';
 import StoryDetailPage from './pages/StoryDetailPage';
 import BeTheChangePage from './pages/BeTheChangePage';
@@ -39,8 +40,8 @@ function App() {
           <Route path="/projects/:slug" element={<ProjectPage />} />
           <Route path="/internship" element={<InternshipPage />} />
           <Route path="/associated-schools" element={<AssociatedSchoolsPage />} />
+          <Route path="/associated-colleges" element={<AssociatedCollegesPage />} />
           <Route path="/resource-manager" element={<ResourceManagerPage />} />
-          <Route path="/associated-colleges" element={<InternshipPage />} />
           <Route path="/story-of-change" element={<StoryOfChangePage />} />
           <Route path="/story-of-change/:storySlug" element={<StoryDetailPage />} />
           <Route path="/impact-of-social-initiatives" element={<StoryOfChangePage />} />
