@@ -32,26 +32,6 @@ function GetInvolved() {
         <h2>Get Involved</h2>
         <p className="intro-text">Join us in making a difference</p>
         
-        <div className="involvement-options">
-          <div className="option-card">
-            <h3>💝 Donate</h3>
-            <p>Your donation directly helps us serve those in need</p>
-            <button className="btn btn-primary">Contribute Now</button>
-          </div>
-
-          <div className="option-card">
-            <h3>🤝 Volunteer</h3>
-            <p>Share your time and skills with our community programs</p>
-            <button className="btn btn-primary">Join Us</button>
-          </div>
-
-          <div className="option-card">
-            <h3>📢 Spread Awareness</h3>
-            <p>Help us reach more people and expand our impact</p>
-            <button className="btn btn-primary">Share Story</button>
-          </div>
-        </div>
-
         <div className="contact-form-container">
           <h3>Contact Us</h3>
           <form className="contact-form" onSubmit={handleSubmit}>
