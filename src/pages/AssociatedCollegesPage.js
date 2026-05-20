@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/ProjectPages.css';
-
 import { getPartnerSchoolsAndColleges } from '../utils/partnerSchoolsApi';
 
-function AssociatedSchoolsPage() {
-  const [schools, setSchools] = useState([]);
+function AssociatedCollegesPage() {
+  const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getPartnerSchoolsAndColleges().then((res) => {
       if (res && res.data) {
-        setSchools(res.data.filter(item => item.type === 'school'));
+        setColleges(res.data.filter(item => item.type === 'college'));
       }
       setLoading(false);
     });
@@ -19,29 +18,29 @@ function AssociatedSchoolsPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Associated Schools</h1>
-        <p>Partner schools offering internship opportunities for students and young professionals.</p>
+        <h1>Associated Colleges</h1>
+        <p>Partner colleges offering internship opportunities for students and young professionals.</p>
       </div>
       <div className="page-content">
         <section className="internship-section">
-          <h2>Our Partner Schools</h2>
+          <h2>Our Partner Colleges</h2>
           {loading ? <div>Loading...</div> : (
             <div className="schools-grid">
-              {schools.map(school => (
-                <div className="school-card" key={school.id}>
+              {colleges.map(college => (
+                <div className="school-card" key={college.id}>
                   <div className="school-image">
-                    <img src={school.image?.formats?.small?.url ? `${process.env.REACT_APP_STRAPI_URL || 'https://umang-backend-ty0e.onrender.com'}${school.image.formats.small.url}` : '/assets/images/school-partner.jpg'} alt={school.schoolName} />
+                    <img src={college.image?.formats?.small?.url ? `${process.env.REACT_APP_STRAPI_URL || 'https://umang-backend-ty0e.onrender.com'}${college.image.formats.small.url}` : '/assets/images/school-partner.jpg'} alt={college.schoolName} />
                   </div>
                   <div className="school-info">
-                    <h3>{school.schoolName}</h3>
-                    <p className="school-location">Location: {school.location}</p>
+                    <h3>{college.schoolName}</h3>
+                    <p className="school-location">Location: {college.location}</p>
                     <p className="school-description">
-                      {Array.isArray(school.description) ? school.description.map((desc, i) => desc.children?.map((child, j) => <span key={j}>{child.text}</span>)) : school.description}
+                      {Array.isArray(college.description) ? college.description.map((desc, i) => desc.children?.map((child, j) => <span key={j}>{child.text}</span>)) : college.description}
                     </p>
                     <div className="internship-opportunities">
                       <h4>Available Internships:</h4>
                       <ul>
-                        {school.programs?.split(',').map((prog, i) => <li key={i}>{prog.trim()}</li>)}
+                        {college.programs?.split(',').map((prog, i) => <li key={i}>{prog.trim()}</li>)}
                       </ul>
                     </div>
                   </div>
@@ -55,4 +54,4 @@ function AssociatedSchoolsPage() {
   );
 }
 
-export default AssociatedSchoolsPage;
+export default AssociatedCollegesPage;

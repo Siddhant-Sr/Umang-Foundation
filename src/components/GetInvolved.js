@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import '../styles/GetInvolved.css';
 import useIntersection from '../hooks/useIntersection';
+import { API_BASE_URL } from '../config/api';
 
 function GetInvolved() {
   const [ref, isVisible] = useIntersection({ threshold: 0.1 });
@@ -19,11 +21,40 @@ function GetInvolved() {
     }));
   };
 
-  const handleSubmit = (e) => {
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Thank you for reaching out! We will get back to you soon.');
-    setFormData({ name: '', email: '', message: '' });
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contact-uses`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: {
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+          },
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to submit form.');
+      }
+      setSuccess(true);
+      setFormData({ name: '', email: '', message: '' });
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,27 +62,6 @@ function GetInvolved() {
       <div className="get-involved-container">
         <h2>Get Involved</h2>
         <p className="intro-text">Join us in making a difference</p>
-        
-        <div className="involvement-options">
-          <div className="option-card">
-            <h3>💝 Donate</h3>
-            <p>Your donation directly helps us serve those in need</p>
-            <button className="btn btn-primary">Contribute Now</button>
-          </div>
-
-          <div className="option-card">
-            <h3>🤝 Volunteer</h3>
-            <p>Share your time and skills with our community programs</p>
-            <button className="btn btn-primary">Join Us</button>
-          </div>
-
-          <div className="option-card">
-            <h3>📢 Spread Awareness</h3>
-            <p>Help us reach more people and expand our impact</p>
-            <button className="btn btn-primary">Share Story</button>
-          </div>
-        </div>
-
         <div className="contact-form-container">
           <h3>Contact Us</h3>
           <form className="contact-form" onSubmit={handleSubmit}>
@@ -85,7 +95,11 @@ function GetInvolved() {
                 required
               ></textarea>
             </div>
-            <button type="submit" className="btn btn-primary">Send Message</button>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Message'}
+            </button>
+            {success && <div className="form-success" style={{ color: 'green', marginTop: 10 }}>Thank you for reaching out! We will get back to you soon.</div>}
+            {error && <div className="form-error" style={{ color: 'red', marginTop: 10 }}>{error}</div>}
           </form>
         </div>
       </div>

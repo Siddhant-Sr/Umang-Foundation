@@ -11,7 +11,9 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectPage from './pages/ProjectPage';
 import InternshipPage from './pages/InternshipPage';
 import AssociatedSchoolsPage from './pages/AssociatedSchoolsPage';
+import AssociatedCollegesPage from './pages/AssociatedCollegesPage';
 import StoryOfChangePage from './pages/StoryOfChangePage';
+import StoryDetailPage from './pages/StoryDetailPage';
 import BeTheChangePage from './pages/BeTheChangePage';
 import PaymentGatewayPage from './pages/PaymentGatewayPage';
 import MediaGalleryPage from './pages/MediaGalleryPage';
@@ -38,10 +40,12 @@ function App() {
           <Route path="/projects/:slug" element={<ProjectPage />} />
           <Route path="/internship" element={<InternshipPage />} />
           <Route path="/associated-schools" element={<AssociatedSchoolsPage />} />
+          <Route path="/associated-colleges" element={<AssociatedCollegesPage />} />
           <Route path="/resource-manager" element={<ResourceManagerPage />} />
-          <Route path="/associated-colleges" element={<InternshipPage />} />
           <Route path="/story-of-change" element={<StoryOfChangePage />} />
+          <Route path="/story-of-change/:storySlug" element={<StoryDetailPage />} />
           <Route path="/impact-of-social-initiatives" element={<StoryOfChangePage />} />
+          <Route path="/impact-of-social-initiatives/:storySlug" element={<StoryDetailPage />} />
           <Route path="/be-the-change" element={<BeTheChangePage />} />
           <Route path="/payment-gateway" element={<PaymentGatewayPage />} />
           <Route path="/membership" element={<BeTheChangePage />} />

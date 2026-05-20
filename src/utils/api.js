@@ -83,3 +83,4 @@ export const getCorporateLogos = () => fetchData('/corporate-logos?populate=*');
 export const getHeroImages = () => fetchData('/hero-images?populate=*');
 export const getLogo = () => fetchData('/logo?populate=*');
 export const getResourceManagers = () => fetchData('/resource-managers?populate=*');
+export const getStoryOfChanges = () => fetchData('/story-of-changes?populate=*');
